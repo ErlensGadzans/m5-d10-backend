@@ -82,9 +82,31 @@ moviesRouter.post("/:movieID/reviews", async (req, res, next) => {
       err.httpStatusCode = 404;
       next(err);
     }
-  } catch (error) {
-    console.log(error);
-    next(error);
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+});
+
+moviesRouter.get("/:movieID/reviews", async (req, res, next) => {
+  try {
+    const moviesDB = await readMovies();
+    const singleMovie = moviesDB.find(
+      (movie) => movie.imdbID === req.params.movieID
+    );
+    if (singleMovie) {
+      if (singleMovie.hasOwnProperty("reviews")) {
+        res.send(singleMovie.reviews);
+      } else {
+        res.send("No reviews");
+      }
+    } else {
+      console.log(err);
+      next(err);
+    }
+  } catch (err) {
+    console.log(err);
+    next(err);
   }
 });
 
