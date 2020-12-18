@@ -51,4 +51,41 @@ moviesRouter.delete("/:movieID", async (req, res, next) => {
   }
 });
 
+moviesRouter.post("/:movieID/reviews", async (req, res, next) => {
+  try {
+    const moviesDB = await readMovies();
+    const singleMovieIndex = moviesDB.findIndex(
+      (movie) => movie.imdbID === req.params.movieID
+    );
+
+    if (singleMovieIndex !== -1) {
+      if (moviesDB[singleMovieIndex].hasOwnProperty("reviews")) {
+        moviesDB[singleMovieIndex].reviews.push({
+          ...req.body,
+          _id: uniqid(),
+          createdAt: new Date(),
+        });
+      } else {
+        moviesDB[singleMovieIndex].reviews = [
+          {
+            ...req.body,
+            _id: uniqid(),
+            elementId: req.params.moviesDB,
+            createdAt: new Date(),
+          },
+        ];
+      }
+      await writeMovies(moviesDB);
+      res.send("Ok");
+    } else {
+      const err = new Error();
+      err.httpStatusCode = 404;
+      next(err);
+    }
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
 module.exports = moviesRouter;
