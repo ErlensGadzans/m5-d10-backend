@@ -9,11 +9,14 @@ const {
   catchAllHandler,
 } = require("./library/errorHandling");
 
+const moviesRouter = require("./movies");
+
 const server = express();
 
 const port = process.env.PORT || 3077;
 
 server.use(express.json());
+server.use("/movies", moviesRouter);
 
 //error handlers
 server.use(notFoundHandler);
