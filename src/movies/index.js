@@ -33,4 +33,22 @@ moviesRouter.post("/", async (req, res, next) => {
   }
 });
 
+moviesRouter.delete("/:movieID", async (req, res, next) => {
+  try {
+    const moviesDB = await readMovies();
+    const singleMovie = moviesDB.find(
+      (movie) => movie.imdbID !== req.params.movieID
+    );
+    if (singleMovie) {
+      const filteredMoviesDB = moviesDB.filter(
+        (movie) => movie.imdbID !== req.params.movieID
+      );
+      await writeMovies(filteredMoviesDB);
+    }
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+});
+
 module.exports = moviesRouter;
