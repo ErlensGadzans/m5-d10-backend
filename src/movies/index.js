@@ -44,6 +44,7 @@ moviesRouter.delete("/:movieID", async (req, res, next) => {
         (movie) => movie.imdbID !== req.params.movieID
       );
       await writeMovies(filteredMoviesDB);
+      res.send("Ok");
     }
   } catch (err) {
     console.log(err);
@@ -102,6 +103,37 @@ moviesRouter.get("/:movieID/reviews", async (req, res, next) => {
       }
     } else {
       console.log(err);
+      next(err);
+    }
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+});
+
+moviesRouter.put("/:movieID/reviews/:reviewID", async (req, res, next) => {
+  try {
+    const moviesDB = await readMovies();
+    const singleMovieIndex = moviesDB.findIndex(
+      (movie) => movie.imdbID === req.params.movieID
+    );
+
+    if (singleMovieIndex !== -1) {
+      const currentReview = moviesDB[singleMovieIndex].reviews.findIndex(
+        (review) => review._id === req.params.reviewID
+      );
+
+      moviesDB[singleMovieIndex].reviews[currentReview] = {
+        ...moviesDB[singleMovieIndex].reviews[currentReview],
+        ...req.body,
+        updatedAd: new Date(),
+      };
+
+      await writeMovies(moviesDB);
+      res.send("Ok");
+    } else {
+      const err = new Error();
+      err.httpStatusCode = 404;
       next(err);
     }
   } catch (err) {
